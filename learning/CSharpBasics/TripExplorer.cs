@@ -4,6 +4,17 @@ static class TripExplorer
 {
     public static void Run(List<Trip> trips)
     {
+
+        Console.WriteLine("enter your budget: ");
+        try{
+            decimal budget = decimal.Parse(Console.ReadLine()!);
+        }
+        catch(FormatException)
+        {
+            Console.WriteLine("Invalid input. Please enter a valid decimal number.");
+            return;
+        }
+
         while (true)
         {
             DisplayMenu();

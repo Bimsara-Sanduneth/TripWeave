@@ -1,4 +1,4 @@
-/*Console.WriteLine("Welcome to TripWeave!");
+﻿/*Console.WriteLine("Welcome to TripWeave!");
 
 Console.WriteLine("================================");
 Console.WriteLine("          TripWeave          ");
@@ -525,7 +525,7 @@ class Trip
         Budget = budget;
     }
 }*/
-
+/*
 List<Trip> trips = new List<Trip>
 {
     new Trip("Ella", 5, 50000),
@@ -537,15 +537,96 @@ List<Trip> trips = new List<Trip>
 };
 
 TripExplorer.Run(trips);
+*/
+/*
+Console.WriteLine("===== Create Trip =====");
+Console.WriteLine();
 
-class Trip{
-    public string Destination {get; set;}
-    public int Days{get; set;}
-    public decimal Budget{get; set;}
-    
-    public Trip(string destination, int days, decimal budget){
-        Destination = destination;
-        Days = days;
-        Budget = budget;
+try
+{
+    Console.WriteLine("Destination:");
+    string destination = Console.ReadLine() ?? "";
+
+    Console.WriteLine("Days:");
+    int days = int.Parse(Console.ReadLine() ?? "");
+
+    Console.WriteLine("Budget:");
+    decimal budget = decimal.Parse(Console.ReadLine() ?? "");
+
+    Trip trip = new Trip(destination, days, budget);
+    Console.WriteLine($"Trip created: {trip.Destination} - {trip.Days} days - Rs. {trip.Budget:N2}");
+}
+catch (FormatException)
+{
+    Console.WriteLine("Invalid number format.");
+}
+catch (OverflowException)
+{
+    Console.WriteLine("Number is outside the supported range.");
+}
+finally
+{
+    Console.WriteLine("Trip creation attempt completed.");
+}
+*/
+Trip trip = new Trip("Ella", 5, 100000, 2);
+Console.WriteLine($"Valid trip: {trip.Destination}, Budget: {trip.Budget:N2}, Travelers: {trip.Travelers}, Days: {trip.Days}");
+
+Console.WriteLine("===== Three Invalid Operations in One Try =====");
+try
+{
+    trip.SetBudget(-1000);
+    trip.SetTravelers(0); // Not reached: SetBudget throws first.
+    trip.SetDays(-3);     // Not reached either.
+}
+catch (ArgumentOutOfRangeException ex)
+{
+    Console.WriteLine(ex.Message);
+}
+
+// Separate attempts demonstrate the other two validation rules.
+Console.WriteLine("===== Invalid Travelers =====");
+try
+{
+    trip.SetTravelers(0);
+}
+catch (ArgumentOutOfRangeException ex)
+{
+    Console.WriteLine(ex.Message);
+}
+
+Console.WriteLine("===== Invalid Days =====");
+try
+{
+    trip.SetDays(-3);
+}
+catch (ArgumentOutOfRangeException ex)
+{
+    Console.WriteLine(ex.Message);
+}
+
+Console.WriteLine($"After rejected changes: Budget: {trip.Budget:N2}, Travelers: {trip.Travelers}, Days: {trip.Days}");
+
+trip.SetBudget(0);
+trip.SetTravelers(1);
+trip.SetDays(1);
+Console.WriteLine($"Allowed boundaries: Budget: {trip.Budget:N2}, Travelers: {trip.Travelers}, Days: {trip.Days}");
+
+Console.WriteLine("===== Trip Confirmation =====");
+Trip plannedTrip = new Trip("Ella", 5, 100000, 2);
+
+// Check below budget, exactly on budget, and over budget.
+foreach (decimal plannedCost in new decimal[] { 80000, 100000, 120000 })
+{
+    plannedTrip.SetPlannedCost(plannedCost);
+    Console.WriteLine($"Planned cost: Rs. {plannedTrip.PlannedCost:N2}");
+    try
+    {
+        plannedTrip.ConfirmTrip();
+        Console.WriteLine("Trip confirmed.");
+    }
+    catch (InsufficientTripBudgetException ex)
+    {
+        Console.WriteLine(ex.Message);
     }
 }
