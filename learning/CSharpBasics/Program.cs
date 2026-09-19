@@ -569,7 +569,88 @@ finally
     Console.WriteLine("Trip creation attempt completed.");
 }
 */
+List<Trip> trips = new List<Trip>
+{
+    new Trip("Ella", 5, 50000) { Notes = "Visit Nine Arches Bridge" },
+    new Trip("Kandy", 3, 30000),
+    new Trip("Tokyo", 10, 400000) { Notes = null },
+    new Trip("Bali", 7, 250000),
+    new Trip("Galle", 2, 25000),
+    new Trip("Nuwara Eliya", 6, 200000)
+};
+
+DisplayTripInformation(trips[0]);
+DisplayTripInformation(trips[2]);
+
+Trip upcomingTrip = new Trip("Ella", 5, 100000);
+Trip completedTrip = new Trip("Kandy", 5, 100000)
+{
+    Rating = 5,
+    ActualCost = 92500m
+};
+
+DisplayTripStatus(upcomingTrip);
+DisplayTripStatus(completedTrip);
+
+static void DisplayTripStatus(Trip trip)
+{
+    Console.WriteLine("===== Trip Status =====");
+    Console.WriteLine($"Destination: {trip.Destination}");
+    string rating = trip.Rating?.ToString("0'/5'") ?? "Not rated";
+    Console.WriteLine($"Rating: {rating}");
+
+    if (trip.ActualCost.HasValue)
+    {
+        decimal actualCost = trip.ActualCost.Value;
+        Console.WriteLine($"Actual Cost: Rs. {actualCost.ToString("N2", System.Globalization.CultureInfo.InvariantCulture)}");
+    }
+    else
+    {
+        Console.WriteLine("Actual Cost: Not recorded");
+    }
+    Console.WriteLine();
+}
+
+foreach (string destination in new[] { "Ella", "London" })
+{
+    Console.WriteLine($"Searching for: {destination}");
+    Trip? foundTrip = trips.FirstOrDefault(candidate =>
+        candidate.Destination.Equals(destination, StringComparison.OrdinalIgnoreCase));
+
+    Console.WriteLine(foundTrip?.Destination ?? "Trip not found.");
+    Console.WriteLine();
+}
+
+Console.WriteLine("===== Travel Tips =====");
+{
+    string? travelTip = null;
+    travelTip ??= "Plan ahead and enjoy the journey.";
+    Console.WriteLine(travelTip);
+}
+{
+    string? travelTip = "Pack light.";
+    travelTip ??= "Plan ahead and enjoy the journey.";
+    Console.WriteLine(travelTip);
+}
+Console.WriteLine();
+
+static void DisplayTripInformation(Trip trip)
+{
+    Console.WriteLine("===== Trip =====");
+    Console.WriteLine($"Destination: {trip.Destination}");
+    Console.WriteLine($"Days: {trip.Days}");
+    Console.WriteLine($"Budget: Rs. {trip.Budget.ToString("N2", System.Globalization.CultureInfo.InvariantCulture)}");
+    Console.WriteLine($"Status: {trip.Status}");
+    Console.WriteLine($"Notes: {trip.Notes ?? "No notes added."}");
+    Console.WriteLine();
+}
+
 Trip trip = new Trip("Ella", 5, 100000, 2);
+DisplayTripInformation(trip);
+trip.DisplayStatusMessage();
+trip.Confirm();
+DisplayTripInformation(trip);
+trip.DisplayStatusMessage();
 Console.WriteLine($"Valid trip: {trip.Destination}, Budget: {trip.Budget:N2}, Travelers: {trip.Travelers}, Days: {trip.Days}");
 
 Console.WriteLine("===== Three Invalid Operations in One Try =====");
@@ -630,3 +711,116 @@ foreach (decimal plannedCost in new decimal[] { 80000, 100000, 120000 })
         Console.WriteLine(ex.Message);
     }
 }
+
+Console.WriteLine("===== Test 1: Valid Lifecycle =====");
+Trip lifecycleTrip = new Trip("Ella", 5, 100000);
+ShowStatus("Initial", lifecycleTrip);
+lifecycleTrip.Confirm();
+ShowStatus("After confirm", lifecycleTrip);
+lifecycleTrip.Complete();
+ShowStatus("After complete", lifecycleTrip);
+
+Console.WriteLine("===== Test 2: Invalid Completion =====");
+Trip unconfirmedTrip = new Trip("Kandy", 3, 30000);
+ExpectInvalidTransition(unconfirmedTrip, unconfirmedTrip.Complete);
+
+Console.WriteLine("===== Test 3: Cancelled Trip =====");
+Trip cancelledTrip = new Trip("Galle", 2, 25000);
+cancelledTrip.Cancel();
+ShowStatus("After cancel", cancelledTrip);
+ExpectInvalidTransition(cancelledTrip, cancelledTrip.Confirm);
+
+Console.WriteLine("===== Test 4: Completed Trip =====");
+Trip finishedTrip = new Trip("Bali", 7, 250000);
+finishedTrip.Confirm();
+finishedTrip.Complete();
+ShowStatus("Before cancel attempt", finishedTrip);
+ExpectInvalidTransition(finishedTrip, finishedTrip.Cancel);
+
+static void ShowStatus(string label, Trip trip)
+{
+    Console.WriteLine($"{label}: {trip.Status}");
+}
+
+static void ExpectInvalidTransition(Trip trip, Action operation)
+{
+    TripStatus originalStatus = trip.Status;
+    ShowStatus("Before attempt", trip);
+    try
+    {
+        operation();
+    }
+    catch (InvalidTripStateException ex)
+    {
+        Console.WriteLine(ex.Message);
+        ShowStatus("Status", trip);
+        if (trip.Status != originalStatus)
+        {
+            throw new Exception("A rejected transition changed the trip's status.");
+        }
+        return;
+    }
+    throw new Exception("Expected InvalidTripStateException, but the operation succeeded.");
+}
+
+Console.WriteLine("===== Coordinate Value Equality =====");
+LocationCoordinate location1 = new LocationCoordinate(6.8667, 81.0466);
+LocationCoordinate location2 = new LocationCoordinate(6.8667, 81.0466);
+LocationCoordinate location3 = new LocationCoordinate(7.2906, 80.6337);
+Console.WriteLine($"location1 == location2: {location1 == location2}");
+Console.WriteLine($"Same instance: {ReferenceEquals(location1, location2)}");
+Console.WriteLine($"location1 == location3: {location1 == location3}");
+
+Console.WriteLine("===== Copy a Coordinate with 'with' =====");
+LocationCoordinate changedLocation = location1 with { Latitude = 6.9 };
+Console.WriteLine($"Original: {location1}");
+Console.WriteLine($"Modified copy: {changedLocation}");
+Console.WriteLine($"Original unchanged: {location1.Latitude == 6.8667 && location1.Longitude == 81.0466}");
+Console.WriteLine($"Longitude preserved: {changedLocation.Longitude == location1.Longitude}");
+
+Console.WriteLine("===== Date Range Value Equality =====");
+DateRange dateRange1 = new DateRange(new DateTime(2026, 10, 1), new DateTime(2026, 10, 5));
+DateRange dateRange2 = new DateRange(new DateTime(2026, 10, 1), new DateTime(2026, 10, 5));
+Console.WriteLine($"dateRange1 == dateRange2: {dateRange1 == dateRange2}");
+
+Console.WriteLine("===== Percentage Validation =====");
+foreach (double value in new double[] { 75, 0, 100 })
+{
+    Percentage percentage = new Percentage(value);
+    Console.WriteLine($"{value}: valid ({percentage.Value}%)");
+}
+
+foreach (double value in new double[] { -10, 120, double.NaN })
+{
+    try
+    {
+        _ = new Percentage(value);
+    }
+    catch (ArgumentOutOfRangeException ex)
+    {
+        Console.WriteLine($"{value}: {ex.GetType().Name}");
+        continue;
+    }
+    throw new Exception($"Expected ArgumentOutOfRangeException for {value}.");
+}
+
+Console.WriteLine("===== Struct Assignment Copies the Value =====");
+Percentage progress1 = new Percentage(75);
+Percentage progress2 = progress1;
+Console.WriteLine($"progress1: {progress1.Value}%");
+Console.WriteLine($"progress2: {progress2.Value}%");
+
+Console.WriteLine("===== Class Assignment Copies the Reference =====");
+Trip trip1 = new Trip("Ella", 5, 100000);
+Trip trip2 = trip1;
+trip2.Confirm();
+Console.WriteLine($"trip1.Status: {trip1.Status}");
+Console.WriteLine($"trip2.Status: {trip2.Status}");
+Console.WriteLine($"Same Trip object: {ReferenceEquals(trip1, trip2)}");
+
+Console.WriteLine("===== Integer Assignment Copies the Value =====");
+int number1 = 10;
+int number2 = number1;
+number2 = 50;
+Console.WriteLine($"number1 = {number1}");
+Console.WriteLine($"number2 = {number2}");
