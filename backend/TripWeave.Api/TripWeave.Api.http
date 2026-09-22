@@ -1,6 +1,37 @@
-@TripWeave.Api_HostAddress = http://localhost:5273
+@baseUrl = https://localhost:7297
 
-GET {{TripWeave.Api_HostAddress}}/weatherforecast/
+### Create a new trip
+POST {{baseUrl}}/api/trips
+Content-Type: application/json
+
+{
+  "destination": "Nuwara Eliya",
+  "days": 4,
+  "budget": 45000
+}
+
+### Update trip 1
+PUT http://localhost:5000/api/trips/1
+Content-Type: application/json
+
+{
+  "destination": "Ella",
+  "days": 5,
+  "budget": 50000
+}
+
+PATCH /api/trips/1
+Content-Type: application/json
+
+{
+  "budget": 60000
+}
+### Get all trips
+GET {{baseUrl}}/api/trips
+
+### Get the new trip
+GET {{baseUrl}}/api/trips/4
+
+### Get weather forecast
+GET {{baseUrl}}/weatherforecast/
 Accept: application/json
-
-###
