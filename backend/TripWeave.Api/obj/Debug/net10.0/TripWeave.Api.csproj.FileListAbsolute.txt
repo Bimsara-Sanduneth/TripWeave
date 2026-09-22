@@ -31,3 +31,4 @@ D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\refint\Tr
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave.Api.pdb
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave.Api.genruntimeconfig.cache
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\ref\TripWeave.Api.dll
+D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave.Api.sourcelink.json
