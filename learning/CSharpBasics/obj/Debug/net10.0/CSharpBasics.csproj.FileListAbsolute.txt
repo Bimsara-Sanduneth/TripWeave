@@ -12,3 +12,7 @@ D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\refint\CS
 D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\CSharpBasics.pdb
 D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\CSharpBasics.genruntimeconfig.cache
 D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\ref\CSharpBasics.dll
+D:\my files\projects\TripWeave\learning\CSharpBasics\bin\Debug\net10.0\Microsoft.Extensions.DependencyInjection.dll
+D:\my files\projects\TripWeave\learning\CSharpBasics\bin\Debug\net10.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\CSharpBasics.csproj.AssemblyReference.cache
+D:\my files\projects\TripWeave\learning\CSharpBasics\obj\Debug\net10.0\CSharpBa.CE12F503.Up2Date

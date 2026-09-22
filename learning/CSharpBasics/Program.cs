@@ -1,4 +1,6 @@
-﻿/*Console.WriteLine("Welcome to TripWeave!");
+﻿using Microsoft.Extensions.DependencyInjection;
+
+/*Console.WriteLine("Welcome to TripWeave!");
 
 Console.WriteLine("================================");
 Console.WriteLine("          TripWeave          ");
@@ -824,3 +826,272 @@ int number2 = number1;
 number2 = 50;
 Console.WriteLine($"number1 = {number1}");
 Console.WriteLine($"number2 = {number2}");
+
+Console.WriteLine("===== TripWeave Destination Overview =====");
+Task<string> overviewWeatherTask = GetWeatherAsync();
+Task<string> attractionsTask = GetAttractionsAsync();
+Task<string> hotelTask = GetHotelAsync();
+Console.WriteLine("All TripWeave requests started.");
+
+// Results follow the order of the tasks passed to WhenAll.
+string[] results = await Task.WhenAll(overviewWeatherTask, attractionsTask, hotelTask);
+
+Console.WriteLine($"Weather: {results[0]}");
+Console.WriteLine($"Attractions: {results[1]}");
+Console.WriteLine($"Hotel: {results[2]}");
+
+// Example daily costs in LKR.
+decimal estimatedDailyCost = CalculateEstimatedDailyCost(
+    hotelCost: 15000m,
+    foodCost: 4500m,
+    transportCost: 2500m);
+Console.WriteLine($"Estimated daily cost: LKR {estimatedDailyCost:N2}");
+
+await SendTripNotificationAsync();
+string exchangeRate = await GetExchangeRateAsync();
+Console.WriteLine($"Exchange rate: {exchangeRate}");
+
+Console.WriteLine("===== Weather Task State =====");
+Task<string> weatherTask = GetWeatherAsync();
+
+Console.WriteLine("Before await:");
+Console.WriteLine($"Status: {weatherTask.Status}");
+Console.WriteLine($"IsCompleted: {weatherTask.IsCompleted}");
+Console.WriteLine($"IsCompletedSuccessfully: {weatherTask.IsCompletedSuccessfully}");
+Console.WriteLine($"IsFaulted: {weatherTask.IsFaulted}");
+
+string weather = await weatherTask;
+
+Console.WriteLine("After await:");
+Console.WriteLine($"Status: {weatherTask.Status}");
+Console.WriteLine($"IsCompleted: {weatherTask.IsCompleted}");
+Console.WriteLine($"IsCompletedSuccessfully: {weatherTask.IsCompletedSuccessfully}");
+Console.WriteLine($"IsFaulted: {weatherTask.IsFaulted}");
+
+Console.WriteLine($"Weather: {weather}");
+
+Console.WriteLine("===== Faulted Weather Task State =====");
+Task<string> faultedWeatherTask = GetFaultedWeatherAsync();
+
+Console.WriteLine("Before await:");
+Console.WriteLine($"Status: {faultedWeatherTask.Status}");
+Console.WriteLine($"IsCompleted: {faultedWeatherTask.IsCompleted}");
+Console.WriteLine($"IsCompletedSuccessfully: {faultedWeatherTask.IsCompletedSuccessfully}");
+Console.WriteLine($"IsFaulted: {faultedWeatherTask.IsFaulted}");
+
+try
+{
+    string faultedWeather = await faultedWeatherTask;
+    Console.WriteLine($"Weather: {faultedWeather}");
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine($"Weather request failed: {ex.Message}");
+}
+
+// Catching the exception does not change the task's faulted state.
+Console.WriteLine("After await (exception caught):");
+Console.WriteLine($"Status: {faultedWeatherTask.Status}");
+Console.WriteLine($"IsCompleted: {faultedWeatherTask.IsCompleted}");
+Console.WriteLine($"IsCompletedSuccessfully: {faultedWeatherTask.IsCompletedSuccessfully}");
+Console.WriteLine($"IsFaulted: {faultedWeatherTask.IsFaulted}");
+
+Console.WriteLine("===== TripWeave Weather =====");
+using (CancellationTokenSource cancellationSource = new CancellationTokenSource())
+{
+    Task<string> cancellableWeatherTask = GetCancellableWeatherAsync(cancellationSource.Token);
+
+    await Task.Delay(2000);
+    Console.WriteLine("Cancelling weather request...");
+    cancellationSource.Cancel();
+
+    try
+    {
+        string cancellableWeather = await cancellableWeatherTask;
+        Console.WriteLine($"Weather: {cancellableWeather}");
+    }
+    catch (OperationCanceledException) when (cancellationSource.IsCancellationRequested)
+    {
+        Console.WriteLine("Weather request was cancelled.");
+    }
+
+    Console.WriteLine($"Status: {cancellableWeatherTask.Status}");
+    Console.WriteLine($"Completed: {cancellableWeatherTask.IsCompleted}");
+    Console.WriteLine($"Faulted: {cancellableWeatherTask.IsFaulted}");
+    Console.WriteLine($"Canceled: {cancellableWeatherTask.IsCanceled}");
+}
+
+Console.WriteLine("===== Three-Service Task States =====");
+using (CancellationTokenSource attractionsCancellation = new CancellationTokenSource())
+{
+    Task<string> successfulWeatherTask = GetWeatherAsync();
+    Task<string> failedHotelTask = GetFaultedHotelAsync();
+    Task<string> canceledAttractionsTask = GetCancellableAttractionsAsync(attractionsCancellation.Token);
+    Task<string[]> allServicesTask = Task.WhenAll(
+        successfulWeatherTask, failedHotelTask, canceledAttractionsTask);
+    Console.WriteLine("All three services started.");
+
+    await Task.Delay(1000);
+    Console.WriteLine("Cancelling attractions request...");
+    attractionsCancellation.Cancel();
+
+    try
+    {
+        await allServicesTask;
+    }
+    catch (InvalidOperationException ex)
+    {
+        Console.WriteLine($"Service failure: {ex.Message}");
+    }
+
+    // WhenAll waits for every task. A fault takes precedence over cancellation.
+    Console.WriteLine($"Weather     → {successfulWeatherTask.Status}");
+    Console.WriteLine($"Hotel       → {failedHotelTask.Status}");
+    Console.WriteLine($"Attractions → {canceledAttractionsTask.Status}");
+    Console.WriteLine($"WhenAll     → {allServicesTask.Status}");
+}
+
+ServiceCollection services = new ServiceCollection();
+services.AddTransient<IWeatherService, WeatherService>();
+services.AddTransient<TripPlanner>();
+services.AddTransient<TransientService>();
+services.AddScoped<ScopedService>();
+services.AddSingleton<SingletonService>();
+
+using ServiceProvider provider = services.BuildServiceProvider();
+
+Console.WriteLine("===== TripWeave Planner =====");
+TripPlanner planner = provider.GetRequiredService<TripPlanner>();
+await planner.ShowWeatherAsync();
+
+Console.WriteLine("===== Dependency Injection Lifetimes =====");
+using (IServiceScope scopeA = provider.CreateScope())
+using (IServiceScope scopeB = provider.CreateScope())
+{
+    var a = ResolveServices("Scope A", scopeA.ServiceProvider);
+    var b = ResolveServices("Scope B", scopeB.ServiceProvider);
+
+    Console.WriteLine($"Transient: all four instances different: {new[] { a.Transient1, a.Transient2, b.Transient1, b.Transient2 }.Distinct().Count() == 4}");
+    Console.WriteLine($"Scoped: same inside scope A: {a.Scoped1 == a.Scoped2}");
+    Console.WriteLine($"Scoped: same inside scope B: {b.Scoped1 == b.Scoped2}");
+    Console.WriteLine($"Scoped: different across scopes: {a.Scoped1 != b.Scoped1}");
+    Console.WriteLine($"Singleton: same across all four resolutions: {a.Singleton1 == a.Singleton2 && a.Singleton1 == b.Singleton1 && a.Singleton1 == b.Singleton2}");
+}
+
+Console.WriteLine("===== Unregistered TestService =====");
+try
+{
+    provider.GetRequiredService<TestService>();
+    throw new Exception("Expected resolution of unregistered TestService to fail.");
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine($"{ex.GetType().Name}: {ex.Message}");
+}
+
+static (Guid Transient1, Guid Transient2, Guid Scoped1, Guid Scoped2, Guid Singleton1, Guid Singleton2)
+    ResolveServices(string label, IServiceProvider scopeProvider)
+{
+    TransientService transient1 = scopeProvider.GetRequiredService<TransientService>();
+    TransientService transient2 = scopeProvider.GetRequiredService<TransientService>();
+    ScopedService scoped1 = scopeProvider.GetRequiredService<ScopedService>();
+    ScopedService scoped2 = scopeProvider.GetRequiredService<ScopedService>();
+    SingletonService singleton1 = scopeProvider.GetRequiredService<SingletonService>();
+    SingletonService singleton2 = scopeProvider.GetRequiredService<SingletonService>();
+
+    Console.WriteLine($"{label}:");
+    Console.WriteLine($"  Transient: {transient1.Id} / {transient2.Id}");
+    Console.WriteLine($"  Scoped:    {scoped1.Id} / {scoped2.Id}");
+    Console.WriteLine($"  Singleton: {singleton1.Id} / {singleton2.Id}");
+
+    return (transient1.Id, transient2.Id, scoped1.Id, scoped2.Id, singleton1.Id, singleton2.Id);
+}
+
+static async Task<string> GetFaultedHotelAsync()
+{
+    Console.WriteLine("Fetching hotel (simulated failure)...");
+
+    await Task.Delay(3000);
+
+    throw new InvalidOperationException("Hotel service is unavailable.");
+}
+
+static async Task<string> GetCancellableAttractionsAsync(CancellationToken cancellationToken)
+{
+    Console.WriteLine("Fetching attractions...");
+
+    await Task.Delay(5000, cancellationToken);
+
+    return "Nine Arches Bridge, Little Adam's Peak";
+}
+
+static async Task<string> GetCancellableWeatherAsync(CancellationToken cancellationToken)
+{
+    Console.WriteLine("Fetching weather...");
+
+    await Task.Delay(5000, cancellationToken);
+
+    return "24°C - Cloudy";
+}
+
+static async Task<string> GetFaultedWeatherAsync()
+{
+    Console.WriteLine("Fetching weather (simulated failure)...");
+
+    await Task.Delay(2000);
+
+    throw new InvalidOperationException("Weather service is unavailable.");
+}
+
+static decimal CalculateEstimatedDailyCost(
+    decimal hotelCost,
+    decimal foodCost,
+    decimal transportCost)
+{
+    return hotelCost + foodCost + transportCost;
+}
+
+static async Task SendTripNotificationAsync()
+{
+    Console.WriteLine("Sending trip notification...");
+
+    await Task.Delay(1000);
+
+    Console.WriteLine("Trip notification sent.");
+}
+
+static async Task<string> GetExchangeRateAsync()
+{
+    Console.WriteLine("Fetching exchange rate...");
+
+    await Task.Delay(2000);
+
+    return "1 USD = 300 LKR";
+}
+
+static async Task<string> GetWeatherAsync()
+{
+    Console.WriteLine("Fetching weather...");
+
+    await Task.Delay(2000);
+
+    return "24°C - Cloudy";
+}
+
+static async Task<string> GetAttractionsAsync()
+{
+    Console.WriteLine("Fetching attractions...");
+
+    await Task.Delay(2000);
+
+    return "Nine Arches Bridge, Little Adam's Peak";
+}
+
+static async Task<string> GetHotelAsync()
+{
+    Console.WriteLine("Fetching hotel...");
+
+    await Task.Delay(3000);
+
+    return "Ella Mountain View Hotel";
+}

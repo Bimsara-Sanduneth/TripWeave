@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "loShEjNPDhM=",
+  "dgSpecHash": "hAL6C74792U=",
   "success": true,
   "projectFilePath": "D:\\my files\\projects\\TripWeave\\learning\\CSharpBasics\\CSharpBasics.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.12\\microsoft.extensions.dependencyinjection.10.0.12.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.12\\microsoft.extensions.dependencyinjection.abstractions.10.0.12.nupkg.sha512"
+  ],
   "logs": []
 }
