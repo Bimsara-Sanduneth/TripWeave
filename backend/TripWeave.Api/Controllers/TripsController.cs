@@ -82,6 +82,21 @@ public class TripsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteTrip(int id)
+    {
+        Trip? trip = Trips.FirstOrDefault(t => t.Id == id);
+
+        if (trip is null)
+        {
+            return NotFound();
+        }
+
+        Trips.Remove(trip);
+
+        return NoContent();
+    }
+
     [HttpGet("{id:int}")]
     public ActionResult<Trip> GetTripById(int id)
     {
