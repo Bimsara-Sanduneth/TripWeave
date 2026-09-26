@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using TripWeave.Api.DTOs;
 using TripWeave.Api.Models;
@@ -66,8 +68,66 @@ public class TripsController : ControllerBase
     }
 
     [HttpPatch("{id:int}")]
-    public IActionResult PatchTrip(int id, [FromBody] PatchTripDto dto)
+    public IActionResult PatchTrip(int id, [FromBody] JsonElement json)
     {
+        if (json.ValueKind != JsonValueKind.Object)
+        {
+            return BadRequest("Expected a JSON object.");
+        }
+
+        if (!json.EnumerateObject().Any())
+        {
+            return BadRequest("Provide at least one property.");
+        }
+
+        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "destination",
+            "days",
+            "budget"
+        };
+
+        foreach (var property in json.EnumerateObject())
+        {
+            if (!allowed.Contains(property.Name))
+            {
+                return BadRequest($"Unknown property: {property.Name}.");
+            }
+
+            if (property.Value.ValueKind == JsonValueKind.Null)
+            {
+                return BadRequest($"{property.Name} cannot be null.");
+            }
+        }
+
+        PatchTripDto? dto;
+
+        try
+        {
+            dto = json.Deserialize<PatchTripDto>(
+                new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        }
+        catch (JsonException)
+        {
+            return BadRequest("Invalid property value.");
+        }
+
+        if (dto is null)
+        {
+            return BadRequest("Invalid request.");
+        }
+
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(dto);
+
+        bool isValid = Validator.TryValidateObject(
+            dto, context, results, validateAllProperties: true);
+
+        if (!isValid)
+        {
+            return BadRequest(results.Select(result => result.ErrorMessage));
+        }
+
         bool updated = _tripService.PatchTrip(id, dto);
 
         if (!updated)
