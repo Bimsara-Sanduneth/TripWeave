@@ -65,6 +65,19 @@ public class TripsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("{id:int}")]
+    public IActionResult PatchTrip(int id, [FromBody] PatchTripDto dto)
+    {
+        bool updated = _tripService.PatchTrip(id, dto);
+
+        if (!updated)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:int}")]
     public IActionResult DeleteTrip(int id)
     {

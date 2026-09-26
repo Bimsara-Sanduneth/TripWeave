@@ -32,3 +32,11 @@ D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave.Api.genruntimeconfig.cache
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\ref\TripWeave.Api.dll
 D:\my files\projects\TripWeave\backend\TripWeave.Api\obj\Debug\net10.0\TripWeave.Api.sourcelink.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\appsettings.Development.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\appsettings.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.staticwebassets.endpoints.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.exe
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.deps.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.runtimeconfig.json
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.dll
+C:\Users\User\AppData\Local\Temp\TripWeave-patch-check\TripWeave.Api.pdb

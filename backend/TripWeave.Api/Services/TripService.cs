@@ -1,5 +1,6 @@
 using TripWeave.Api.Interfaces;
 using TripWeave.Api.Models;
+using TripWeave.Api.DTOs;
 
 namespace TripWeave.Api.Services;
 
@@ -31,6 +32,28 @@ public class TripService : ITripService{
         trip.Destination = updatedTrip.Destination;
         trip.Days = updatedTrip.Days;
         trip.Budget = updatedTrip.Budget;
+        return true;
+    }
+
+    public bool PatchTrip(int id, PatchTripDto dto){
+        Trip? trip = _trips.FirstOrDefault(t => t.Id == id);
+
+        if (trip is null){
+            return false;
+        }
+
+        if (dto.Destination is not null){
+            trip.Destination = dto.Destination;
+        }
+
+        if (dto.Days.HasValue){
+            trip.Days = dto.Days.Value;
+        }
+
+        if (dto.Budget.HasValue){
+            trip.Budget = dto.Budget.Value;
+        }
+
         return true;
     }
 
