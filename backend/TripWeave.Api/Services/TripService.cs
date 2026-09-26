@@ -21,6 +21,19 @@ public class TripService : ITripService{
         return trip;
     }
 
+    public bool UpdateTrip(int id, Trip updatedTrip){
+        Trip? trip = _trips.FirstOrDefault(t => t.Id == id);
+
+        if (trip is null){
+            return false;
+        }
+
+        trip.Destination = updatedTrip.Destination;
+        trip.Days = updatedTrip.Days;
+        trip.Budget = updatedTrip.Budget;
+        return true;
+    }
+
     public bool DeleteTrip(int id){
         Trip? trip = _trips.FirstOrDefault(t => t.Id == id);
 

@@ -2,36 +2,19 @@ using Microsoft.AspNetCore.Mvc;
 using TripWeave.Api.DTOs;
 using TripWeave.Api.Models;
 using TripWeave.Api.Interfaces;
+
 namespace TripWeave.Api.Controllers;
 
 [ApiController]
 [Route("api/trips")]
 public class TripsController : ControllerBase
 {
-    private static readonly List<Trip> Trips = new()
+    private readonly ITripService _tripService;
+
+    public TripsController(ITripService tripService)
     {
-        new Trip
-        {
-            Id = 1,
-            Destination = "Ella",
-            Days = 5,
-            Budget = 50000
-        },
-        new Trip
-        {
-            Id = 2,
-            Destination = "Kandy",
-            Days = 3,
-            Budget = 30000
-        },
-        new Trip
-        {
-            Id = 3,
-            Destination = "Galle",
-            Days = 4,
-            Budget = 40000
-        }
-    };
+        _tripService = tripService;
+    }
 
     [HttpGet]
     public ActionResult<List<Trip>> GetAllTrips()
@@ -44,24 +27,19 @@ public class TripsController : ControllerBase
     [HttpPost]
     public ActionResult<Trip> CreateTrip([FromBody] CreateTripDto request)
     {
-        int newId = Trips.Count == 0
-            ? 1
-            : Trips.Max(t => t.Id) + 1;
-
         Trip trip = new Trip
         {
-            Id = newId,
             Destination = request.Destination,
             Days = request.Days,
             Budget = request.Budget
         };
 
-        Trips.Add(trip);
+        var createdTrip = _tripService.CreateTrip(trip);
 
         return CreatedAtAction(
             nameof(GetTripById),
-            new { id = trip.Id },
-            trip
+            new { id = createdTrip.Id },
+            createdTrip
         );
     }
 
@@ -70,16 +48,19 @@ public class TripsController : ControllerBase
         int id,
         [FromBody] UpdateTripDto request)
     {
-        Trip? trip = Trips.FirstOrDefault(t => t.Id == id);
+        var updatedTrip = new Trip
+        {
+            Destination = request.Destination,
+            Days = request.Days,
+            Budget = request.Budget
+        };
 
-        if (trip is null)
+        bool updated = _tripService.UpdateTrip(id, updatedTrip);
+
+        if (!updated)
         {
             return NotFound();
         }
-
-        trip.Destination = request.Destination;
-        trip.Days = request.Days;
-        trip.Budget = request.Budget;
 
         return NoContent();
     }
@@ -87,14 +68,12 @@ public class TripsController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult DeleteTrip(int id)
     {
-        Trip? trip = Trips.FirstOrDefault(t => t.Id == id);
+        bool deleted = _tripService.DeleteTrip(id);
 
-        if (trip is null)
+        if (!deleted)
         {
             return NotFound();
         }
-
-        Trips.Remove(trip);
 
         return NoContent();
     }
@@ -110,14 +89,6 @@ public class TripsController : ControllerBase
         }
 
         return Ok(trip);
-    }
-
-    
-    private readonly ITripService _tripService;
-
-    public TripsController(ITripService tripService)
-    {
-        _tripService = tripService;
     }
 
 }
