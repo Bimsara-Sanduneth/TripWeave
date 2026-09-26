@@ -1,6 +1,7 @@
 using TripWeave.Api.Interfaces;
 using TripWeave.Api.Services;
 using TripWeave.Api.Configuration;
+using TripWeave.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,13 @@ builder.Services.Configure<TripSettings>(
 builder.Services.AddSingleton<ITripService, TripService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

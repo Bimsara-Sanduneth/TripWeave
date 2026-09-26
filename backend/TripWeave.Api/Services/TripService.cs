@@ -3,6 +3,7 @@ using TripWeave.Api.Models;
 using TripWeave.Api.DTOs;
 using Microsoft.Extensions.Options;
 using TripWeave.Api.Configuration;
+using TripWeave.Api.Exceptions;
 
 namespace TripWeave.Api.Services;
 
@@ -32,7 +33,7 @@ public class TripService : ITripService{
             _logger.LogWarning(
                 "Trip creation rejected because the feature is disabled");
 
-            throw new InvalidOperationException(
+            throw new TripCreationDisabledException(
                 "Trip creation is currently disabled.");
         }
 
@@ -42,9 +43,8 @@ public class TripService : ITripService{
                 trip.Days,
                 _settings.MaxDays);
 
-            throw new ArgumentOutOfRangeException(
-                nameof(trip.Days),
-                $"Trip duration cannot exceed {_settings.MaxDays} days.");
+            throw new TripValidationException(
+                "Trip duration exceeds the maximum allowed days.");
         }
 
         if (trip.Budget > _settings.MaxBudget){
@@ -53,9 +53,8 @@ public class TripService : ITripService{
                 trip.Budget,
                 _settings.MaxBudget);
 
-            throw new ArgumentOutOfRangeException(
-                nameof(trip.Budget),
-                $"Trip budget cannot exceed {_settings.MaxBudget}.");
+            throw new TripValidationException(
+                "Trip budget exceeds the maximum allowed budget.");
         }
 
         trip.Id = _nextId++;
