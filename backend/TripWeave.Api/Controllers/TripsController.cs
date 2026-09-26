@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TripWeave.Api.DTOs;
 using TripWeave.Api.Models;
-
+using TripWeave.Api.Interfaces;
 namespace TripWeave.Api.Controllers;
 
 [ApiController]
@@ -36,7 +36,9 @@ public class TripsController : ControllerBase
     [HttpGet]
     public ActionResult<List<Trip>> GetAllTrips()
     {
-        return Ok(Trips);
+        var trips = _tripService.GetAllTrips();
+
+        return Ok(trips);
     }
 
     [HttpPost]
@@ -100,7 +102,7 @@ public class TripsController : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<Trip> GetTripById(int id)
     {
-        Trip? trip = Trips.FirstOrDefault(t => t.Id == id);
+        Trip? trip = _tripService.GetTripById(id);
 
         if (trip is null)
         {
@@ -109,4 +111,13 @@ public class TripsController : ControllerBase
 
         return Ok(trip);
     }
+
+    
+    private readonly ITripService _tripService;
+
+    public TripsController(ITripService tripService)
+    {
+        _tripService = tripService;
+    }
+
 }
