@@ -10,6 +10,7 @@ Content-Type: application/json
   "budget": 45000
 }
 
+
 ### Update trip 1
 PUT http://localhost:5000/api/trips/1
 Content-Type: application/json
