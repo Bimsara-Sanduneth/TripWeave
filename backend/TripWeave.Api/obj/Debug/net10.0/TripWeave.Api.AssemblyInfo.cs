@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("041a1705-86e2-4966-af15-976f805e6b17")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13575ef760cb0d1baaee35543e2511840d382779")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45a3193903abc3263aeced3d41f1907e7d767801")]
 [assembly: System.Reflection.AssemblyProductAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
