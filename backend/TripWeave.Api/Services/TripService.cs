@@ -64,7 +64,7 @@ public class TripService : ITripService{
             trip.Id);
         return trip;
     }
-
+//just a comment
     public bool UpdateTrip(int id, Trip updatedTrip){
         Trip? trip = _trips.FirstOrDefault(t => t.Id == id);
 
