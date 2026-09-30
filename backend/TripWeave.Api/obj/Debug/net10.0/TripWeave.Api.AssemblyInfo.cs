@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45a3193903abc3263aeced3d41f1907e7d767801")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f8c207c61e4890beaad73f97ced39bb14000c96")]
 [assembly: System.Reflection.AssemblyProductAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TripWeave.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

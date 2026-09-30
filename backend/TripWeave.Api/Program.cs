@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TripWeave.Api.Data;
 using TripWeave.Api.Interfaces;
 using TripWeave.Api.Services;
 using TripWeave.Api.Configuration;
@@ -19,6 +21,19 @@ builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+var connectionString = builder.Configuration
+    .GetConnectionString("TripWeaveDb");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "TripWeave database connection string is missing."
+    );
+}
+
+builder.Services.AddDbContext<TripWeaveDbContext>(
+    options => options.UseNpgsql(connectionString)
+);
 
 var app = builder.Build();
 
